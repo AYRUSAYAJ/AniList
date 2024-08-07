@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anime Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+<body>
+
+  <div id="header">
+    <h1>Anime Dashboard</h1>
+  
+    <div id="searchDiv">
+      <input type="text" id="searchInput" placeholder="Enter Title">
+      <button id ="searchButton">Search</button>
+    </div>
+  
+    <div id="buttonPanel">
+      <button id="myanimelistButton">My Anime List</button>
+      <button id="planningButton">Planning to watch</button>
+      <button id="watchingButton">Watching</button>
+      <button id="completedButton">Completed</button>
+      <button id="onHoldButton">On Hold</button>
+      <button id="droppedButton">Dropped</button>
+      <button id="addToLibraryButton" style="display: none;" onclick="addToLibrary()">Add Selected to Library</button>
+    </div>
+  </div>
+  
+  <div id="validationPopup" class="validationPopup" style="display: none;">
+    <p>Please enter a title before searching.</p>
+    <button onclick="closePopup()">OK</button>
+</div>
+
+<div id="Tablecontainer">
+  <!-- My Anime List Section -->
+  <div id="myanimelist">
+    <h2>My Anime List</h2>
+    
+    <!-- Planning to Watch Table -->
+    <h3>Planning to Watch</h3>
+    <table id="planningTable">
+      <tr>
+        <th>Anime ID</th>
+        <th>Image</th>
+        <th>Title</th>
+        <th>Type</th>
+        <th>Score</th>
+        <th>Scored By</th>
+        <th>Status</th>
+        <th>Episodes</th>
+      </tr>
+    </table>
+    
+    <!-- Watching Table -->
+    <h3>Watching</h3>
+    <table id="watchingTable">
+      <tr>
+        <th>Anime ID</th>
+        <th>Image</th>
+        <th>Title</th>
+        <th>Type</th>
+        <th>Score</th>
+        <th>Scored By</th>
+        <th>Status</th>
+        <th>Episodes</th>
+      </tr>
+    </table>
+    
+    <!-- Completed Table -->
+    <h3>Completed</h3>
+    <table id="completedTable">
+      <tr>
+        <th>Anime ID</th>
+        <th>Image</th>
+        <th>Title</th>
+        <th>Type</th>
+        <th>Score</th>
+        <th>Scored By</th>
+        <th>Status</th>
+        <th>Episodes</th>
+      </tr>
+    </table>
+    
+    <!-- On Hold Table -->
+    <h3>On Hold</h3>
+    <table id="on_holdTable">
+      <tr>
+        <th>Anime ID</th>
+        <th>Image</th>
+        <th>Title</th>
+        <th>Type</th>
+        <th>Score</th>
+        <th>Scored By</th>
+        <th>Status</th>
+        <th>Episodes</th>
+      </tr>
+    </table>
+    
+    <!-- Dropped Table -->
+    <h3>Dropped</h3>
+    <table id="droppedTable">
+      <tr>
+        <th>Anime ID</th>
+        <th>Image</th>
+        <th>Title</th>
+        <th>Type</th>
+        <th>Score</th>
+        <th>Scored By</th>
+        <th>Status</th>
+        <th>Episodes</th>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Anime Details Section -->
+  <div id="animeDetailsDiv"></div>
+
+  <!-- Anime Table Section -->
+  <table id="animeTable">
+    <tr>
+      <th>Anime ID</th>
+      <th>Image</th>
+      <th>Title</th>
+      <th>Type</th>
+      <th>Score</th>
+      <th>Scored By</th>
+      <th>Status</th>
+      <th>Episodes</th>
+      <th>Action</th>
+    </tr>
+  </table>
+
+  <!-- Selected Anime List Section -->
+  <h2></h2>
+  <ul id="selectedList" style="display: none;"></ul>
+
+  <!-- Anime Search Results Section -->
+  <table id="animesearchTable">
+    <tr>
+      <th>Anime ID</th>
+      <th>Image</th>
+      <th>Title</th>
+      <th>Type</th>
+      <th>Score</th>
+      <th>Scored By</th>
+      <th>Status</th>
+      <th>Episodes</th>
+      <th>Action</th>
+    </tr>
+  </table>
+</div>
+
+  <script>
+
+    let attribute = 'planning';
+
+   // Function to handle button click
+function handleButtonClick(buttonId, category) {
+    // Get all buttons in the buttonPanel
+    var buttons = document.querySelectorAll('#buttonPanel button');
+
+    // Iterate through each button
+    buttons.forEach(function(button) {
+        // Check if the button is the clicked button
+        if (button.id === buttonId) {
+            // If it's the clicked button, set its background color to white
+            button.style.backgroundColor = 'white';
+            button.style.color = 'black';
+        } else {
+            button.style.backgroundColor = 'transparent';
+            button.style.color = 'white';
+        }
+    });
+
+    // Perform the specific action associated with the button
+    switch (category) {
+        case 'search':
+            searchByTitle();
+            break;
+        case 'myanimelist':
+            myanimelist();
+            break;
+        case 'planning':
+        case 'watching':
+        case 'completed':
+        case 'on_hold':
+        case 'dropped':
+            setAttributeAndFetchAnimeDetails(category);
+            break;
+        // Add more cases for other button categories as needed
+    }
+}
+
+// Add click event listeners to each button
+// Add click event listeners to each button
+document.getElementById('searchButton').addEventListener('click', function () {
+    handleButtonClick('searchButton', 'search');
+});
+
+document.getElementById('myanimelistButton').addEventListener('click', function () {
+    handleButtonClick('myanimelistButton', 'myanimelist');
+});
+
+document.getElementById('planningButton').addEventListener('click', function () {
+    handleButtonClick('planningButton', 'planning');
+});
+
+document.getElementById('watchingButton').addEventListener('click', function () {
+    handleButtonClick('watchingButton', 'watching');
+});
+
+document.getElementById('completedButton').addEventListener('click', function () {
+    handleButtonClick('completedButton', 'completed');
+});
+
+document.getElementById('onHoldButton').addEventListener('click', function () {
+    handleButtonClick('onHoldButton', 'on_hold');
+});
+
+document.getElementById('droppedButton').addEventListener('click', function () {
+    handleButtonClick('droppedButton', 'dropped');
+});
+
+
+// Add more event listeners for other buttons as needed
+
+
+    function setAttributeAndFetchAnimeDetails(Attribute) {
+      document.getElementById('animeTable').style.display = 'table';
+      document.getElementById('animesearchTable').style.display = 'none';
+      document.getElementById('selectedList').style.display = 'none';
+      document.getElementById('addToLibraryButton').style.display = 'none';
+      document.getElementById('myanimelist').style.display = 'none';
+        attribute = Attribute;
+        fetch(`/api/anime/details/${attribute}`)
+          .then(response => response.json())
+          .then(data => {
+            console.log('Inside fetchAndDisplayAnimeDetails function', attribute);
+            displayAnimeDetails(data,attribute);
+          })
+          .catch(error => console.error('Error fetching data:', error));
+      }
+
+    function displayAnimeDetails(data, attribute) {
+  console.log('Data received:', data);
+  console.log('Inside displayAnimeDetails function', attribute);
+
+  const animeTable = document.getElementById("animeTable");
+  animeTable.innerHTML = '';
+
+  if (!data || data.length === 0) {
+    // Display an image or any placeholder content when data is empty
+    animeTable.innerHTML = '<img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fimgflip.com%2Fmemegenerator%2F288540057%2Fwow-such-empty&psig=AOvVaw1PPijlO5R4cAdAUbyYtCMm&ust=1701725318168000&source=images&cd=vfe&ved=0CBIQjRxqFwoTCMDSpfqa9IIDFQAAAAAdAAAAABAE" alt="Placeholder Image">';
+    return;
+  }
+
+  const tableHeader = `
+    <tr>
+      <th>Anime ID</th>
+      <th>Image</th>
+      <th>Title</th>
+      <th>Type</th>
+      <th>Score</th>
+      <th>Scored By</th>
+      <th>Status</th>
+      <th>Episodes</th>
+      <th>Action</th>
+    </tr>
+  `;
+  animeTable.innerHTML += tableHeader;
+  if (Array.isArray(data)) {
+    data.forEach(anime => {
+      const tableRow = `
+        <tr>
+          <td>${anime.anime_id}</td>
+          <td><img src="${anime.main_picture}" class = "image" alt="${anime.title}"></td>
+          <td>${anime.title_english !== null ? anime.title_english : anime.title}</td>
+          <td>${anime.type}</td>
+          <td>${anime.score}</td>
+          <td>${anime.scored_by}</td>
+          <td>
+            <div class="dropdown">
+              <button class="dropbtn" id="statusSelect_${anime.anime_id}">${attribute || 'Select Status'}</button>
+              <div class="dropdown-content">
+                <a href="#" onclick="changeStatus(${anime.anime_id}, 'completed')">Completed</a>
+                <a href="#" onclick="changeStatus(${anime.anime_id}, 'planning')">Planning</a>
+                <a href="#" onclick="changeStatus(${anime.anime_id}, 'watching')">Watching</a>
+                <a href="#" onclick="changeStatus(${anime.anime_id}, 'on_hold')">On Hold</a>
+                <a href="#" onclick="changeStatus(${anime.anime_id}, 'dropped')">Dropped</a>
+              </div>
+            </div>
+          </td>
+          <td>${anime.episodes}</td>
+          <td><button id="deleteButton" onclick="deleteRecord(${anime.anime_id})">Delete</button></td>
+        </tr>
+      `;
+      animeTable.innerHTML += tableRow;
+
+      // Set the default selected option based on the current status
+      const statusSelect = document.getElementById(`statusSelect_${anime.anime_id}`);
+      statusSelect.value = anime.status;
+    });
+  } else {
+    // If data is not an array, display an error message
+    const errorMessageRow = `
+      <tr>
+        <td colspan="8">Unexpected data format</td>
+      </tr>
+    `;
+    animeTable.innerHTML += errorMessageRow;
+  }
+}
+
+    function changeStatus(animeId, newStatus) {
+      fetch(`/api/anime/changeStatus/${animeId}/${newStatus}`, {
+        method: 'POST'
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Failed to update status for Anime ID ${animeId}. Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log(`Status updated for Anime ID ${animeId}. New status: ${newStatus}`);
+        var buttonId;
+        if (newStatus === 'on_hold') {
+          buttonId = 'onHoldButton';
+        } else {
+          buttonId = `${newStatus}Button`;
+        }
+        const button = document.getElementById(buttonId);
+        if (button) {
+          button.click();
+        }
+      })
+      .catch(error => console.error('Error updating status:', error.message));
+    }
+
+    function deleteRecord(animeId) {
+      fetch(`/api/anime/delete/${animeId}/${attribute}`, {
+    method: 'POST'
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        setAttributeAndFetchAnimeDetails(attribute);
+
+      })
+      .catch(error => console.error('Error deleting anime:', error));
+    }
+
+    function setAttributeAndClickButton(attribute) {
+      switch (attribute) {
+        case 'planning':
+          document.getElementById('planningButton').click();
+          break;
+        case 'watching':
+          document.getElementById('watchingButton').click();
+          break;
+        case 'completed':
+          document.getElementById('completedButton').click();
+          break;
+        case 'on_hold':
+          document.getElementById('onHoldButton').click();
+          break;
+        case 'dropped':
+          document.getElementById('droppedButton').click();
+          break;
+        default:
+          // Handle the default case or do nothing
+      }
+    }
+
+    function searchByTitle() {
+      document.getElementById('animeTable').style.display = 'none';
+      document.getElementById('selectedList').style.display = 'block';
+      document.getElementById('addToLibraryButton').style.display = 'block';
+      document.getElementById('animesearchTable').style.display = 'table';
+      document.getElementById('myanimelist').style.display = 'none';
+
+      var searchTerm = document.getElementById("searchInput").value;
+      if (searchTerm.trim() === "") {
+        document.getElementById("animesearchTable").style.display = "none";
+        document.getElementById("validationPopup").style.display = "block";
+      } else {
+        document.getElementById("validationPopup").style.display = "none";
+        fetch('/search', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ title: searchTerm }),
+        })
+          .then(response => response.json())
+          .then(data => {
+            fetchLibraryStatus(data);
+          })
+          .catch(error => {
+            console.error('Error fetching data:', error);
+          });
+      }
+      }
+
+    function fetchLibraryStatus(searchResults) {
+  fetch('/api/libraryStatus', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ animeIds: searchResults.map(anime => anime.anime_id) }),
+  })
+    .then(response => response.json())
+    .then(libraryStatus => {
+      updateTable(searchResults, libraryStatus);
+    })
+    .catch(error => {
+      console.error('Error fetching library status:', error);
+    });
+}
+
+    function addToLibrary() {
+  var selectedAnimes = [];
+  var table = document.getElementById("animesearchTable");
+
+  for (var i = 1; i < table.rows.length; i++) {
+    var checkboxCell = table.rows[i].cells[table.rows[i].cells.length - 1];
+    var checkbox = checkboxCell.querySelector('input[type="checkbox"]');
+
+    // Check if checkbox exists and is checked
+    if (checkbox !== null && checkbox.checked) {
+      var anime = { anime_id: table.rows[i].cells[0].textContent };
+      selectedAnimes.push(anime);
+    }
+  }
+
+      fetch('/addToLibrary', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ animes: selectedAnimes }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Added to Library:', data);
+      })
+      .catch(error => {
+        console.error('Error adding to Library:', error);
+      });
+      document.getElementById('animesearchTable').style.display = 'none';
+
+  // Show other tables and buttons
+      document.getElementById('animeTable').style.display = 'table';
+      document.getElementById('selectedList').style.display = 'none';
+      document.getElementById('addToLibraryButton').style.display = 'none';
+      document.getElementById('planningButton').click();
+    }
+
+    function myanimelist() {
+      document.getElementById('myanimelist').style.display = 'block';
+      document.getElementById('animeTable').style.display = 'none';
+      document.getElementById('selectedList').style.display = 'none';
+      document.getElementById('addToLibraryButton').style.display = 'none';
+      document.getElementById('animesearchTable').style.display = 'none';
+
+      const categories = ['planning', 'watching', 'completed', 'on_hold', 'dropped'];
+
+      categories.forEach(category => {
+        fetch(`/api/anime/details/${category}`)
+          .then(response => response.json())
+          .then(data => {
+            console.log(`Fetching ${category} data for My Anime List:`, data);
+            // Pass the category as an argument to updateTable
+            updateTableMyAnimeList(data, [], category);
+          })
+          .catch(error => console.error(`Error fetching ${category} data:`, error));
+      });
+    }
+
+    function updateTable(searchResults, libraryStatus) {
+      var table = document.getElementById("animesearchTable");
+      table.innerHTML = ''; // Clear the existing table content
+      
+      // Define the table header
+      if (!searchResults || searchResults.length === 0) {
+        // Display an image or any placeholder content when data is empty
+        table.innerHTML = '<img src="https://i.imgflip.com/4rsexl.png?a471840" alt="Placeholder Image">';
+        return;
+      }
+
+      var tableHeader = `
+        <tr>
+          <th>Anime ID</th>
+          <th>Image</th>
+          <th>Title</th>
+          <th>Type</th>
+          <th>Score</th>
+          <th>Scored By</th>
+          <th>Status</th>
+          <th>Episodes</th>
+          <!-- Add other headers as needed -->
+          <th>Action</th>
+        </tr>
+      `;
+      table.innerHTML += tableHeader;
+
+      // Define the table body
+      searchResults.forEach((anime, index) => {
+        var row = table.insertRow(table.rows.length);
+        
+        // Add cells to the row
+        var animeIdCell = row.insertCell(0);
+        animeIdCell.textContent = anime.anime_id;
+
+        var imageCell = row.insertCell(1);
+        imageCell.innerHTML = `<img src="${anime.main_picture}" class ="image" alt="${anime.title}">`;
+
+        var titleCell = row.insertCell(2);
+        titleCell.textContent = (anime.title_english !== null) ? anime.title_english : anime.title;
+
+        var typeCell = row.insertCell(3);
+        typeCell.textContent = anime.type;
+
+        var scoreCell = row.insertCell(4);
+        scoreCell.textContent = anime.score;
+
+        var scoredByCell = row.insertCell(5);
+        scoredByCell.textContent = anime.scored_by;
+
+        var statusCell = row.insertCell(6);
+        statusCell.textContent = anime.status;
+
+        var episodesCell = row.insertCell(7);
+        episodesCell.textContent = anime.episodes;
+
+        // Add other cells as needed
+
+        var actionCell = row.insertCell(row.cells.length);
+
+        // Check if the anime is in the user's library
+        if (libraryStatus[index]) {
+          actionCell.textContent = 'In Library';
+        } else {
+          var checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          actionCell.appendChild(checkbox);
+        }
+      });
+    }
+
+    function updateTableMyAnimeList(data, libraryStatus, category) {
+      const tableId = `${category}Table`; // Generate the table id based on the category
+      const table = document.getElementById(tableId);
+
+      // Define the table header
+      var tableHeader = `
+        <tr>
+          <th>Anime ID</th>
+          <th>Image</th>
+          <th>Title</th>
+          <th>Type</th>
+          <th>Score</th>
+          <th>Scored By</th>
+          <th>Status</th>
+          <th>Episodes</th>
+          <!-- Add other headers as needed -->
+        </tr>
+      `;
+      table.innerHTML += tableHeader;
+
+      if (!data || data.length === 0) {
+        table.innerHTML = '<img src="" alt="Placeholder Image">';
+        return;
+      }
+
+      // Clear existing rows in the table (excluding the header)
+      while (table.rows.length > 1) {
+        table.deleteRow(1);
+      }
+
+      // Define the table body
+      data.forEach((anime, index) => {
+        const row = table.insertRow(table.rows.length);
+
+        // Add cells to the row
+        var animeIdCell = row.insertCell(0);
+        animeIdCell.textContent = anime.anime_id;
+
+        var imageCell = row.insertCell(1);
+        imageCell.innerHTML = `<img src="${anime.main_picture}" class ="image" alt="${anime.title}">`;
+
+        var titleCell = row.insertCell(2);
+        titleCell.textContent = (anime.title_english !== null) ? anime.title_english : anime.title;
+
+        var typeCell = row.insertCell(3);
+        typeCell.textContent = anime.type;
+
+        var scoreCell = row.insertCell(4);
+        scoreCell.textContent = anime.score;
+
+        var scoredByCell = row.insertCell(5);
+        scoredByCell.textContent = anime.scored_by;
+
+        var statusCell = row.insertCell(6);
+        statusCell.textContent = anime.status;
+
+        var episodesCell = row.insertCell(7);
+        episodesCell.textContent = anime.episodes;
+
+      });
+    }
+   
+    function closePopup() {
+      document.getElementById("validationPopup").style.display = "none";
+    }
+
+  </script>
+</body>
+</html>
